@@ -41,9 +41,11 @@ while does:
             does = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_PAGEDOWN:
-                zoom -= 1
+                if zoom != 0:
+                    zoom -= 1
             if event.key == pygame.K_PAGEUP:
-                zoom += 1
+                if zoom != 17:
+                    zoom += 1
             updated = False
     if not updated:
         position = get_coords('Москва')
