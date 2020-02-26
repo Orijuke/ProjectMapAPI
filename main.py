@@ -4,6 +4,7 @@ import sys
 
 import pygame
 
+size = (600, 450)
 zoom = 12
 
 
@@ -32,7 +33,7 @@ def get_coords(geo_object):
 
 # Инициализируем pygame
 pygame.init()
-
+position = get_coords('Москва')
 does = True
 updated = False
 while does:
@@ -46,9 +47,22 @@ while does:
             if event.key == pygame.K_PAGEUP:
                 if zoom != 17:
                     zoom += 1
+            if event.key == pygame.K_UP:
+                xy[0] += 0.5
+                position = str(xy[0]) + ',' + str(xy[1])
+            if event.key == pygame.K_DOWN:
+                xy[0] -= 0.5
+                position = str(xy[0]) + ',' + str(xy[1])
+            if event.key == pygame.K_LEFT:
+                xy[1] -= 0.5
+                position = str(xy[0]) + ',' + str(xy[1])
+            if event.key == pygame.K_RIGHT:
+                xy[1] += 0.5
+                position = str(xy[0]) + ',' + str(xy[1])
+            print(xy)
             updated = False
     if not updated:
-        position = get_coords('Москва')
+        xy = [float(position.split(',')[0]), float(position.split(',')[1])]
         response = None
         map_request = "https://static-maps.yandex.ru/1.x/?ll=" + position + f"&z={zoom}&size=600,450&l=map"
         response = requests.get(map_request)
