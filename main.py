@@ -4,6 +4,8 @@ import sys
 from math import sqrt
 import pygame
 
+from button import Mode_Button
+
 
 
 
@@ -37,14 +39,22 @@ screen = pygame.display.set_mode(size)
 position = get_coords('Москва')
 xy = [float(position.split(',')[0]), float(position.split(',')[1])]
 
+all_sprites = pygame.sprite.Group()
+buttons = []
+mode_btn = Mode_Button(all_sprites)
+buttons.append(mode_btn)
 zoom = 12
 k = 1 / (2 ** zoom)
+modes = ['map', 'sat', 'skl']
 does = True
 updated = False
 while does:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             does = False
+        all_sprites.update(event)
+        for button in buttons:
+            button.get_event(event)
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_PAGEDOWN:
                 if zoom != 0:
@@ -79,7 +89,6 @@ while does:
             updated = False
 
     if not updated:
-
         response = None
         map_request = "https://static-maps.yandex.ru/1.x/?ll=" + position + f"&z={zoom}&size=600,450&l=map"
         response = requests.get(map_request)
@@ -97,5 +106,6 @@ while does:
         updated = True
 
     screen.blit(pygame.image.load(map_file), (0, 0))
+    all_sprites.draw(screen)
     pygame.display.flip()
 pygame.quit()
