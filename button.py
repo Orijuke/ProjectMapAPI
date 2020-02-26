@@ -27,4 +27,7 @@ class Mode_Button(pygame.sprite.Sprite):
     def get_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
             self.get_click(event.pos)
-    
+            return True
+
+    def get_mode(self):
+        return self.i

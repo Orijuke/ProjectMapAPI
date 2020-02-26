@@ -54,7 +54,8 @@ while does:
             does = False
         all_sprites.update(event)
         for button in buttons:
-            button.get_event(event)
+            if button.get_event(event):
+                updated = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_PAGEDOWN:
                 if zoom != 0:
@@ -86,11 +87,11 @@ while does:
                     xy[0] -= k * size[0] * sqrt(2)
                 position = str(xy[0]) + ',' + str(xy[1])
             print(xy)
-            updated = False
+        updated = False
 
     if not updated:
         response = None
-        map_request = "https://static-maps.yandex.ru/1.x/?ll=" + position + f"&z={zoom}&size=600,450&l=map"
+        map_request = "https://static-maps.yandex.ru/1.x/?ll=" + position + f"&z={zoom}&size=600,450&l=" + modes[mode_btn.get_mode() % 3]
         response = requests.get(map_request)
 
         if not response:
