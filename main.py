@@ -4,6 +4,7 @@ import sys
 
 import pygame
 
+zoom = 12
 
 
 def get_boundary(geo_object):
@@ -14,17 +15,25 @@ def get_boundary(geo_object):
     if response:
         response_data = response.json()
         GeoObject = response_data['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']
-        #GeocoderMetaData = GeoObject['metaDataProperty']['GeocoderMetaData']
-        # print(GeocoderMetaData['text'])
         envelop = GeoObject['boundedBy']['Envelope']
         return envelop['lowerCorner'].replace(' ', ',') + '~' + envelop['upperCorner'].replace(' ', ',')
 
+def get_coords(geo_object):
+    api_adress = 'https://geocode-maps.yandex.ru/1.x'
+    apikey = '40d1649f-0493-4b70-98ba-98533de7710b'
+    response = requests.get(f'{api_adress}/?apikey={apikey}&geocode={geo_object},+1&format=json')
 
-moscow = get_boundary('Москва')
+    if response:
+        response_data = response.json()
+        GeoObject = response_data['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']
+        return ','.join(GeoObject['Point']['pos'].split(' '))
+
+
+moscow = get_coords('Москва')
 
 
 response = None
-map_request = "http://static-maps.yandex.ru/1.x/?l=sat&bbox=" + moscow
+map_request = "https://static-maps.yandex.ru/1.x/?ll=" + moscow + f"&z={zoom}&size=600,450&l=map"
 response = requests.get(map_request)
 
 if not response:
