@@ -86,7 +86,6 @@ while does:
                 if xy[0] > 180:
                     xy[0] -= k * size[0] * sqrt(2)
                 position = str(xy[0]) + ',' + str(xy[1])
-            print(xy)
         updated = False
 
     if not updated:
