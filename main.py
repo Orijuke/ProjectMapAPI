@@ -4,6 +4,8 @@ import sys
 from math import sqrt
 import pygame
 
+#!/usr/bin/python3
+import pygame_textinput
 from button import Mode_Button
 
 
@@ -39,20 +41,25 @@ screen = pygame.display.set_mode(size)
 position = get_coords('Москва')
 xy = [float(position.split(',')[0]), float(position.split(',')[1])]
 
+textinput = pygame_textinput.TextInput()
+
 all_sprites = pygame.sprite.Group()
 buttons = []
 mode_btn = Mode_Button(all_sprites)
 buttons.append(mode_btn)
 zoom = 12
 k = 1 / (2 ** zoom)
-modes = ['map', 'sat', 'skl']
+modes = ['map', 'sat']
 does = True
 updated = False
+clock = pygame.time.Clock()
 while does:
-    for event in pygame.event.get():
+    events = pygame.event.get()
+    for event in events:
         if event.type == pygame.QUIT:
             does = False
         all_sprites.update(event)
+
         for button in buttons:
             if button.get_event(event):
                 updated = False
@@ -66,31 +73,31 @@ while does:
             k = 1 / (2 ** zoom)
 
             if event.key == pygame.K_UP:
-                xy[1] += k * size[1] / sqrt(2)
+                xy[1] += k * size[1] / sqrt(2) / 5
                 if xy[1] > 90:
-                    xy[1] -= k * size[1] / sqrt(2)
+                    xy[1] -= k * size[1] / sqrt(2) * 5
                 position = str(xy[0]) + ',' + str(xy[1])
             if event.key == pygame.K_DOWN:
-                xy[1] -= k * size[1] / sqrt(2)
+                xy[1] -= k * size[1] / sqrt(2) / 5
                 if xy[1] < -90:
-                    xy[1] += k * size[1] / sqrt(2)
+                    xy[1] += k * size[1] / sqrt(2) * 5
                 position = str(xy[0]) + ',' + str(xy[1])
 
             if event.key == pygame.K_LEFT:
-                xy[0] -= k * size[0] * sqrt(2)
+                xy[0] -= k * size[0] * sqrt(2) / 5
                 if xy[0] < -180:
-                    xy[0] += k * size[0] * sqrt(2)
+                    xy[0] += k * size[0] * sqrt(2) * 5
                 position = str(xy[0]) + ',' + str(xy[1])
             if event.key == pygame.K_RIGHT:
-                xy[0] += k * size[0] * sqrt(2)
+                xy[0] += k * size[0] * sqrt(2) / 5
                 if xy[0] > 180:
-                    xy[0] -= k * size[0] * sqrt(2)
+                    xy[0] -= k * size[0] * sqrt(2) * 5
                 position = str(xy[0]) + ',' + str(xy[1])
         updated = False
 
     if not updated:
         response = None
-        map_request = "https://static-maps.yandex.ru/1.x/?ll=" + position + f"&z={zoom}&size=600,450&l=" + modes[mode_btn.get_mode() % 3]
+        map_request = "https://static-maps.yandex.ru/1.x/?ll=" + position + f"&z={zoom}&size=600,450&l=" + modes[mode_btn.get_mode() % 2]
         response = requests.get(map_request)
 
         if not response:
@@ -105,7 +112,12 @@ while does:
             file.write(response.content)
         updated = True
 
+    if textinput.update(events):
+        print(textinput.get_text())
+
     screen.blit(pygame.image.load(map_file), (0, 0))
+    screen.blit(textinput.get_surface(), (60, 15))
     all_sprites.draw(screen)
     pygame.display.flip()
+    clock.tick(30)
 pygame.quit()
