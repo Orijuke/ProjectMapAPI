@@ -4,11 +4,9 @@ import sys
 from math import sqrt
 import pygame
 
-#!/usr/bin/python3
+# !/usr/bin/python3
 import pygame_textinput
 from button import Mode_Button
-
-
 
 
 def get_boundary(geo_object):
@@ -50,6 +48,7 @@ buttons.append(mode_btn)
 zoom = 12
 k = 1 / (2 ** zoom)
 modes = ['map', 'sat']
+points = []
 does = True
 updated = False
 clock = pygame.time.Clock()
@@ -97,7 +96,8 @@ while does:
 
     if not updated:
         response = None
-        map_request = "https://static-maps.yandex.ru/1.x/?ll=" + position + f"&z={zoom}&size=600,450&l=" + modes[mode_btn.get_mode() % 2]
+        map_request = "https://static-maps.yandex.ru/1.x/?ll=" + position + f"&z={zoom}&size=600,450&l=" + modes[
+            mode_btn.get_mode() % 2] + f"&pt={'~'.join(points)}"
         response = requests.get(map_request)
 
         if not response:
@@ -113,7 +113,8 @@ while does:
         updated = True
 
     if textinput.update(events):
-        print(textinput.get_text())
+        position = get_coords(textinput.get_text())
+        points.append(position + ',pm2rdm')
 
     screen.blit(pygame.image.load(map_file), (0, 0))
     screen.blit(textinput.get_surface(), (60, 15))
