@@ -6,7 +6,7 @@ import pygame
 
 # !/usr/bin/python3
 import pygame_textinput
-from button import Mode_Button, Clear_Button
+from button import Mode_Button, Clear_Button, Index_Button
 
 
 def get_boundary(geo_object):
@@ -39,7 +39,11 @@ def get_address(object):
         response_data = response.json()
         GeoObject = response_data['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']
         GeocoderMetaData = GeoObject['metaDataProperty']['GeocoderMetaData']
-        return GeocoderMetaData['text']
+        try:
+            index = GeocoderMetaData['Address']['postal_code']
+        except Exception:
+            index = ''
+        return GeocoderMetaData['text'] + ': ' + index
 
 
 # Инициализируем pygame
@@ -55,9 +59,11 @@ all_sprites = pygame.sprite.Group()
 buttons = []
 mode_btn = Mode_Button(all_sprites)
 clear_btn = Clear_Button(all_sprites)
+index_btn = Index_Button(all_sprites)
 
 buttons.append(mode_btn)
 buttons.append(clear_btn)
+buttons.append(index_btn)
 zoom = 12
 k = 1 / (2 ** zoom)
 modes = ['map', 'sat']
@@ -141,8 +147,11 @@ while does:
     screen.blit(textinput.get_surface(), (60, 15))
     all_sprites.draw(screen)
     f1 = pygame.font.SysFont('serif', 20)
-    text1 = f1.render(text, 0, (0, 0, 0))
-    screen.blit(text1, (40, 60))
+    if index_btn.get_mode():
+        text1 = f1.render(text, 0, (0, 0, 0))
+    else:
+        text1 = f1.render(text.split(': ')[0], 0, (0, 0, 0))
+    screen.blit(text1, (50, 60))
     pygame.display.flip()
     clock.tick(30)
 pygame.quit()
