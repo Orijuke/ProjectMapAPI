@@ -6,7 +6,7 @@ import pygame
 
 # !/usr/bin/python3
 import pygame_textinput
-from button import Mode_Button
+from button import Mode_Button, Clear_Button
 
 
 def get_boundary(geo_object):
@@ -44,7 +44,10 @@ textinput = pygame_textinput.TextInput()
 all_sprites = pygame.sprite.Group()
 buttons = []
 mode_btn = Mode_Button(all_sprites)
+clear_btn = Clear_Button(all_sprites)
+
 buttons.append(mode_btn)
+buttons.append(clear_btn)
 zoom = 12
 k = 1 / (2 ** zoom)
 modes = ['map', 'sat']
@@ -96,6 +99,9 @@ while does:
 
     if not updated:
         response = None
+        if clear_btn.get_mode():
+            points = []
+            clear_btn.i = False
         map_request = "https://static-maps.yandex.ru/1.x/?ll=" + position + f"&z={zoom}&size=600,450&l=" + modes[
             mode_btn.get_mode() % 2] + f"&pt={'~'.join(points)}"
         response = requests.get(map_request)
