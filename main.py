@@ -115,6 +115,7 @@ while does:
     if textinput.update(events):
         position = get_coords(textinput.get_text())
         points.append(position + ',pm2rdm')
+        xy = [float(position.split(',')[0]), float(position.split(',')[1])]
 
     screen.blit(pygame.image.load(map_file), (0, 0))
     screen.blit(textinput.get_surface(), (60, 15))
