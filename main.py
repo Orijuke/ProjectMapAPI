@@ -31,6 +31,16 @@ def get_coords(geo_object):
         GeoObject = response_data['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']
         return ','.join(GeoObject['Point']['pos'].split(' '))
 
+def get_address(object):
+    response = requests.get(
+        f'https://geocode-maps.yandex.ru/1.x/?apikey=40d1649f-0493-4b70-98ba-98533de7710b&geocode={object}&format=json')
+
+    if response:
+        response_data = response.json()
+        GeoObject = response_data['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']
+        GeocoderMetaData = GeoObject['metaDataProperty']['GeocoderMetaData']
+        return GeocoderMetaData['text']
+
 
 # Инициализируем pygame
 pygame.init()
@@ -51,6 +61,7 @@ buttons.append(clear_btn)
 zoom = 12
 k = 1 / (2 ** zoom)
 modes = ['map', 'sat']
+text = ''
 points = []
 does = True
 updated = False
@@ -101,6 +112,7 @@ while does:
         response = None
         if clear_btn.get_mode():
             points = []
+            text = ''
             clear_btn.i = False
         map_request = "https://static-maps.yandex.ru/1.x/?ll=" + position + f"&z={zoom}&size=600,450&l=" + modes[
             mode_btn.get_mode() % 2] + f"&pt={'~'.join(points)}"
@@ -119,13 +131,18 @@ while does:
         updated = True
 
     if textinput.update(events):
-        position = get_coords(textinput.get_text())
+        object = textinput.get_text()
+        position = get_coords(object)
+        text = get_address(object)
         points.append(position + ',pm2rdm')
         xy = [float(position.split(',')[0]), float(position.split(',')[1])]
 
     screen.blit(pygame.image.load(map_file), (0, 0))
     screen.blit(textinput.get_surface(), (60, 15))
     all_sprites.draw(screen)
+    f1 = pygame.font.SysFont('serif', 20)
+    text1 = f1.render(text, 0, (0, 0, 0))
+    screen.blit(text1, (40, 60))
     pygame.display.flip()
     clock.tick(30)
 pygame.quit()
