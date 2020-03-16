@@ -137,11 +137,14 @@ while does:
         updated = True
 
     if textinput.update(events):
-        object = textinput.get_text()
-        position = get_coords(object)
-        text = get_address(object)
-        points.append(position + ',pm2rdm')
-        xy = [float(position.split(',')[0]), float(position.split(',')[1])]
+        try:
+            object = textinput.get_text()
+            position = get_coords(object)
+            text = get_address(object)
+            points.append(position + ',pm2rdm')
+            xy = [float(position.split(',')[0]), float(position.split(',')[1])]
+        except Exception:
+            text = 'Ничего не найдено'
 
     screen.blit(pygame.image.load(map_file), (0, 0))
     screen.blit(textinput.get_surface(), (60, 15))
